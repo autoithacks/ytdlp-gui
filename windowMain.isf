@@ -1,0 +1,203 @@
+; -- Created with ISN Form Studio 2 for ISN AutoIt Studio -- ;
+#include <StaticConstants.au3>
+#include <GUIConstantsEx.au3>
+#include <WindowsConstants.au3>
+#Include <GuiButton.au3>
+#include <EditConstants.au3>
+#include <GuiRichEdit.au3>
+
+$windowMain = GUICreate("windowMain",395,186,-1,-1,-1,-1)
+$input720p = _GUICtrlRichEdit_Create($windowMain,"",75,4,330,42,-1,-1)
+$btnDl720p = GUICtrlCreateButton("DL 720p",0,4,65,30,-1,-1)
+GUICtrlSetOnEvent(-1,"dlIn720p")
+$input360p = _GUICtrlRichEdit_Create($windowMain,"",75,60,330,47,-1,-1)
+$btnDl360p = GUICtrlCreateButton("DL 360p",0,60,65,30,-1,-1)
+GUICtrlSetOnEvent(-1,"dlIn360p")
+$globalLog = GUICtrlCreateEdit("",0,112,403,83,-1,-1)
+GUICtrlSetFont(-1,7,400,0,"Arial")
+
+
+
+#cs
+[gui]
+Handle_deklaration=default
+Handle_deklaration_const=default
+title=windowMain
+breite=395
+hoehe=186
+style=-1
+exstyle=-1
+bgcolour=0xF0F0F0
+bgimage=none
+handle=windowMain
+parent=
+code=
+codebeforegui=
+xpos=-1
+ypos=-1
+center_gui=true
+title_textmode=normal
+isf_include_once=false
+only_controls_in_isf=false
+const_modus=default
+gui_code_in_function=false
+gui_code_in_function_name=
+gui_event_close=
+gui_event_minimize=
+gui_event_restore=
+gui_event_maximize=
+gui_event_mousemove=
+gui_event_primarydown=
+gui_event_primaryup=
+gui_event_secoundarydown=
+gui_event_secoundaryup=
+gui_event_resized=
+gui_event_dropped=
+defaultfont=MS Sans Serif
+defaultfontsize=8
+[0x000D26E4]
+type=richedit
+handle=433
+locked=0
+resize=
+x=75
+y=4
+width=330
+height=42
+func=
+font=MS Sans Serif
+fontsize=8
+fontstyle=400
+fontattribute=0
+tooltip=
+bgimage=
+textcolour=0x000000
+id=$input720p
+text=
+state=$GUI_SHOW+$GUI_ENABLE
+style=
+exstyle=
+bgcolour=
+code=
+order=0
+tabpage=-1
+iconindex=
+iconlarge=0
+textmode=text
+[0x000D26E0]
+type=button
+handle=434
+locked=0
+resize=
+x=0
+y=4
+width=65
+height=30
+func=dlIn720p
+font=MS Sans Serif
+fontsize=8
+fontstyle=400
+fontattribute=0
+tooltip=
+bgimage=
+textcolour=0x000000
+id=$btnDl720p
+text=DL 720p
+state=$GUI_SHOW+$GUI_ENABLE
+style=
+exstyle=
+bgcolour=
+code=
+order=2
+tabpage=-1
+iconindex=
+iconlarge=0
+textmode=text
+[0x00033594]
+type=richedit
+handle=435
+locked=0
+resize=
+x=75
+y=60
+width=330
+height=47
+func=
+font=MS Sans Serif
+fontsize=8
+fontstyle=400
+fontattribute=0
+tooltip=
+bgimage=
+textcolour=0x000000
+id=$input360p
+text=
+state=$GUI_SHOW+$GUI_ENABLE
+style=
+exstyle=
+bgcolour=
+code=
+tabpage=-1
+iconindex=
+iconlarge=0
+textmode=text
+order=4
+[0x00043598]
+type=button
+handle=436
+locked=0
+resize=
+x=0
+y=60
+width=65
+height=30
+func=dlIn360p
+font=MS Sans Serif
+fontsize=8
+fontstyle=400
+fontattribute=0
+tooltip=
+bgimage=
+textcolour=0x000000
+id=$btnDl360p
+text=DL 360p
+state=$GUI_SHOW+$GUI_ENABLE
+style=
+exstyle=
+bgcolour=
+code=
+tabpage=-1
+iconindex=
+iconlarge=0
+textmode=text
+order=5
+[0x000526DE]
+type=edit
+handle=437
+locked=0
+resize=
+x=0
+y=112
+width=403
+height=83
+func=
+font=Arial
+fontsize=7
+fontstyle=400
+fontattribute=0
+tooltip=
+bgimage=
+textcolour=0x000000
+id=$globalLog
+text=
+state=$GUI_SHOW+$GUI_ENABLE
+style=
+exstyle=
+bgcolour=
+code=
+order=7
+tabpage=-1
+iconindex=
+iconlarge=0
+textmode=text
+#ce
