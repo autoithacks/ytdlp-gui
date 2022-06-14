@@ -49,6 +49,7 @@ func dlIn720p()
 	if(not StringInStr($link, 'watch') ) then 
 			 _GUICtrlRichEdit_SetText($input720p, "")
 			 loggen("Draggin pictures not supported!")
+			 GUICtrlSetBkColor($globalLog,$DLERROR)
 		return
 	EndIf 
 	
@@ -96,10 +97,11 @@ Wend
 GUICtrlSetData($log, $line)
 
 if StringInStr($gesamtlog, "error")   then
-		MsgBox($MB_TOPMOST, "STDOUT read:", $gesamtlog)
-        $aArray = _StringBetween($gesamtlog, "Destination: ", "].mp4")
+$aArray = _StringBetween($gesamtlog, "Destination: ", "].mp4")
 		_GUICtrlRichEdit_SetText($input360p, $link)
 		GUICtrlSetBkColor($globalLog,$DLERROR)
+		MsgBox($MB_TOPMOST, "STDOUT read:", $gesamtlog)
+        
 		if isarray($aArray) Then 
 			$tempfile = $aArray[0]
 			FileDelete($tempfile &  "].mp4.part")
@@ -111,7 +113,8 @@ EndIf
 
 
 if  StringInStr($gesamtlog, "already been")  then
-		MsgBox($MB_TOPMOST, "Already downloaded!", $gesamtlog)		
+		MsgBox($MB_TOPMOST, "Already downloaded!", $gesamtlog)	
+	GUICtrlSetBkColor($globalLog,$DLSUCCESS)	
 	return
 EndIf
 	GUICtrlSetBkColor($globalLog,$DLSUCCESS)
