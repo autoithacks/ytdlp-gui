@@ -30,6 +30,8 @@ While 1
    ; DETECT DRAG AND DROP EVENT HERE <-------------------
     Case _GUICtrlRichEdit_GetText($input720p) <> '' ;And Not GUICtrlRead($dircont)
          dlIn720p()
+    Case _GUICtrlRichEdit_GetText($input360p) <> '' ;And Not GUICtrlRead($dircont)
+         dlIn360p()
     endselect
 	
 	
@@ -81,10 +83,10 @@ Func startDL($link,  $params,  $log)
 	Local $line
 	loggen("yt-dlp.exe " &  $params& " -n16 " & $link & @crlf)
 
-	$nu = Run ( "yt-dlp.exe " &  $params& "  " & $link , @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD )
+	$proc = Run ( "yt-dlp.exe " &  $params& "  " & $link , @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD )
 
 While 1
-    $line  =StdoutRead($nu)
+    $line  =StdoutRead($proc)
     $gesamtlog &= $line
 	;$gesamtlog &= @crlf
 	If @error Then ExitLoop
