@@ -17,7 +17,7 @@ $mSpecialitem = GUICtrlCreateMenuItem("?", -1) ; I belong to the main menu
 GUISetOnEvent($GUI_EVENT_CLOSE, "Terminate")
 GUISetState(@SW_SHOW)
 Global $globallogstr
-
+$dlpath= "c:\_downloads\"
 
 While 1
 	
@@ -50,7 +50,7 @@ func dlIn720p()
 	EndIf 
 	
 	GUICtrlSetState($btnDl720p, $GUI_DISABLE)
-		startDL($link, " -22 -P home:c:\_downloads\ ",  "")
+		startDL($link, " -22 -P home:"&$dlpath & " ",  "")
 	 _GUICtrlRichEdit_SetText($input720p, "")
 	 GUICtrlSetState($btnDl720p, $GUI_ENABLE)
 EndFunc
@@ -58,7 +58,7 @@ EndFunc
 func dlIn360p()
 	GUICtrlSetState($btnDl360p, $GUI_DISABLE)
 	$link = _GUICtrlRichEdit_GetText($input360p)
-	startDL($link, " -f 18 -P home:c:\_downloads\ ",  "")
+	startDL($link, " -f 18 -P home:"&$dlpath & " ",  "")
 	 _GUICtrlRichEdit_SetText($input360p, "")
 	 GUICtrlSetState($btnDl360p, $GUI_ENABLE)
 EndFunc
@@ -99,7 +99,7 @@ if StringInStr($gesamtlog, "error")   then
         $aArray = _StringBetween($gesamtlog, "Destination: ", "].mp4")
         ; Display the results in _ArrayDisplay.
 ;        _ArrayDisplay($aArray, "$STR_ENDISSTART")
-	 _GUICtrlRichEdit_SetText($input360p, $link)
+		_GUICtrlRichEdit_SetText($input360p, $link)
 		if isarray($aArray) Then 
 			$tempfile = $aArray[0]
 			FileDelete($tempfile &  "].mp4.part")
