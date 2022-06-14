@@ -9,6 +9,11 @@
 
 
 Opt("GUIOnEventMode", 1)
+#cs
+$mFilemenu = GUICtrlCreateMenu("File")
+$mExititem = GUICtrlCreateMenuItem("Exit", $mFilemenu)
+$mSpecialitem = GUICtrlCreateMenuItem("?", -1) ; I belong to the main menu
+#ce
 GUISetOnEvent($GUI_EVENT_CLOSE, "Terminate")
 GUISetState(@SW_SHOW)
 Global $globallogstr
@@ -101,15 +106,12 @@ if StringInStr($gesamtlog, "error")   then
 			
 		EndIf
 		
-		
 	return
 EndIf
 
 
 if  StringInStr($gesamtlog, "already been")  then
-		MsgBox($MB_TOPMOST, "Already downloaded!", $gesamtlog)
-
-		
+		MsgBox($MB_TOPMOST, "Already downloaded!", $gesamtlog)		
 	return
 EndIf
 

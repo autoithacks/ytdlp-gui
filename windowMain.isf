@@ -5,8 +5,12 @@
 #Include <GuiButton.au3>
 #include <EditConstants.au3>
 #include <GuiRichEdit.au3>
+#Include <GuiMenu.au3>
+#include <WinAPIShellEx.au3>
 
-$windowMain = GUICreate("windowMain",395,186,-1,-1,-1,-1)
+$windowMain = GUICreate("ytdlp-gui",395,205,-1,-1,-1,-1)
+$fileMenuItem = GUICtrlCreateMenu("File")
+$fileMenuExit = GUICtrlCreateMenuItem("Exit",$fileMenuItem,-1,0)
 $input720p = _GUICtrlRichEdit_Create($windowMain,"",75,4,330,42,-1,-1)
 $btnDl720p = GUICtrlCreateButton("DL 720p",0,4,65,30,-1,-1)
 GUICtrlSetOnEvent(-1,"dlIn720p")
@@ -21,15 +25,15 @@ GUICtrlSetFont(-1,7,400,0,"Arial")
 #cs
 [gui]
 Handle_deklaration=default
-Handle_deklaration_const=default
-title=windowMain
+Handle_deklaration_const=false
+title=ytdlp-gui
 breite=395
-hoehe=186
+hoehe=205
 style=-1
 exstyle=-1
 bgcolour=0xF0F0F0
 bgimage=none
-handle=windowMain
+handle=$windowMain
 parent=
 code=
 codebeforegui=
@@ -55,7 +59,7 @@ gui_event_resized=
 gui_event_dropped=
 defaultfont=MS Sans Serif
 defaultfontsize=8
-[0x000D26E4]
+[0x001008F0]
 type=richedit
 handle=433
 locked=0
@@ -84,7 +88,7 @@ tabpage=-1
 iconindex=
 iconlarge=0
 textmode=text
-[0x000D26E0]
+[0x000A359C]
 type=button
 handle=434
 locked=0
@@ -113,7 +117,7 @@ tabpage=-1
 iconindex=
 iconlarge=0
 textmode=text
-[0x00033594]
+[0x000A08B4]
 type=richedit
 handle=435
 locked=0
@@ -142,7 +146,7 @@ iconindex=
 iconlarge=0
 textmode=text
 order=4
-[0x00043598]
+[0x00080984]
 type=button
 handle=436
 locked=0
@@ -171,7 +175,7 @@ iconindex=
 iconlarge=0
 textmode=text
 order=5
-[0x000526DE]
+[0x000B0870]
 type=edit
 handle=437
 locked=0
@@ -196,6 +200,35 @@ exstyle=
 bgcolour=
 code=
 order=7
+tabpage=-1
+iconindex=
+iconlarge=0
+textmode=text
+[0x00083368]
+type=menu
+handle=438
+locked=0
+resize=
+x=0
+y=0
+width=25
+height=6
+func=
+font=MS Sans Serif
+fontsize=8
+fontstyle=400
+fontattribute=0
+tooltip=
+bgimage=
+textcolour=0x000000
+id=
+text=[0x056A7C70][MBREAK]handle=$fileMenuItem[MBREAK]textmode=text[MBREAK]text=File[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=[MBREAK]childs=0x056A7B50[MBREAK][0x056A7B50][MBREAK]handle=$fileMenuExit[MBREAK]textmode=text[MBREAK]text=Exit[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=[MBREAK]childs=-1[MBREAK][root][MBREAK]order=0x056A7C70
+state=
+style=
+exstyle=
+bgcolour=
+code=
+order=6
 tabpage=-1
 iconindex=
 iconlarge=0
