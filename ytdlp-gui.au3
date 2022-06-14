@@ -8,16 +8,19 @@
 #include <MsgBoxConstants.au3>
 
 
+const $DLERROR = 0xFF0000
+const $DLINPROCESS = 0xFFFF00
+const $DLSUCCESS = 0x339966
+$dlpath=""
+
 Opt("GUIOnEventMode", 1)
-#cs
-$mFilemenu = GUICtrlCreateMenu("File")
-$mExititem = GUICtrlCreateMenuItem("Exit", $mFilemenu)
-$mSpecialitem = GUICtrlCreateMenuItem("?", -1) ; I belong to the main menu
-#ce
+
+
+readsettings()
 GUISetOnEvent($GUI_EVENT_CLOSE, "Terminate")
 GUISetState(@SW_SHOW)
 Global $globallogstr
-$dlpath= "c:\_downloads\"
+	
 
 While 1
 	
@@ -27,8 +30,6 @@ While 1
    ; DETECT DRAG AND DROP EVENT HERE <-------------------
     Case _GUICtrlRichEdit_GetText($input720p) <> '' ;And Not GUICtrlRead($dircont)
          dlIn720p()
-
-           
     endselect
 	
 	
@@ -74,15 +75,13 @@ func loggen($text,  $guictrl = $globalLog)
 EndFunc
 
 Func startDL($link,  $params,  $log)	
+
+	GUICtrlSetBkColor($globalLog,$DLINPROCESS)
 	$gesamtlog = ""
 	Local $line
 	loggen("yt-dlp.exe " &  $params& " -n16 " & $link & @crlf)
 
-;$nu = ShellExecuteWait ( "yt-dlp.exe",  $params& " -n 16 " & $link , @ScriptDir)
-
 	$nu = Run ( "yt-dlp.exe " &  $params& "  " & $link , @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD )
-
-;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $nu = ' & $nu & @crlf & '>Error code: ' & @error & @crlf) ;### Debug Console
 
 While 1
     $line  =StdoutRead($nu)
@@ -97,9 +96,8 @@ GUICtrlSetData($log, $line)
 if StringInStr($gesamtlog, "error")   then
 		MsgBox($MB_TOPMOST, "STDOUT read:", $gesamtlog)
         $aArray = _StringBetween($gesamtlog, "Destination: ", "].mp4")
-        ; Display the results in _ArrayDisplay.
-;        _ArrayDisplay($aArray, "$STR_ENDISSTART")
 		_GUICtrlRichEdit_SetText($input360p, $link)
+		GUICtrlSetBkColor($globalLog,$DLERROR)
 		if isarray($aArray) Then 
 			$tempfile = $aArray[0]
 			FileDelete($tempfile &  "].mp4.part")
@@ -114,9 +112,23 @@ if  StringInStr($gesamtlog, "already been")  then
 		MsgBox($MB_TOPMOST, "Already downloaded!", $gesamtlog)		
 	return
 EndIf
-
+	GUICtrlSetBkColor($globalLog,$DLSUCCESS)
 	loggen(@crlf& "Download complete")
 	
 
 
 EndFunc
+
+func opensettings()
+	$dldir = FileSelectFolder ( "dialog text)", "c:\" )
+	
+	if(StringLen($dldir ) > 2) Then 
+	IniWrite("settings.ini", "", "download_to", $dldir)
+	loggen("DL dir set to=" & $dldir)
+	readsettings()
+	EndIf 
+EndFunc
+
+func readsettings(	)
+$dlpath=  IniRead("settings.ini", "", "download_to", "c:\_downloads\") 
+EndFunc 

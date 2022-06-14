@@ -10,7 +10,10 @@
 
 $windowMain = GUICreate("ytdlp-gui",395,205,-1,-1,-1,-1)
 $fileMenuItem = GUICtrlCreateMenu("File")
+$MenuItemSettings = GUICtrlCreateMenuItem("Download To",$fileMenuItem,-1,0)
+GUICtrlSetOnEvent(-1, "opensettings")
 $fileMenuExit = GUICtrlCreateMenuItem("Exit",$fileMenuItem,-1,0)
+GUICtrlSetOnEvent(-1, "Terminate")
 $input720p = _GUICtrlRichEdit_Create($windowMain,"",75,4,330,42,-1,-1)
 $btnDl720p = GUICtrlCreateButton("DL 720p",0,4,65,30,-1,-1)
 GUICtrlSetOnEvent(-1,"dlIn720p")
@@ -222,7 +225,7 @@ tooltip=
 bgimage=
 textcolour=0x000000
 id=
-text=[0x056A7C70][MBREAK]handle=$fileMenuItem[MBREAK]textmode=text[MBREAK]text=File[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=[MBREAK]childs=0x056A7B50[MBREAK][0x056A7B50][MBREAK]handle=$fileMenuExit[MBREAK]textmode=text[MBREAK]text=Exit[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=[MBREAK]childs=-1[MBREAK][root][MBREAK]order=0x056A7C70
+text=[0x056A7C70][MBREAK]handle=$fileMenuItem[MBREAK]textmode=text[MBREAK]text=File[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=[MBREAK]childs=0x056A7B50[MBREAK][0x056A7B50][MBREAK]handle=$fileMenuExit[MBREAK]textmode=text[MBREAK]text=Exit[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=[MBREAK]childs=-1[MBREAK][root][MBREAK]order=0x056A9770[MBREAK][0x056A9698][MBREAK]handle=$MenuItem1729[MBREAK]textmode=text[MBREAK]text=Settings[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=[MBREAK]childs=-1[MBREAK][0x056A98D8][MBREAK]handle=$fileMenuExit[MBREAK]textmode=text[MBREAK]text=Exit[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=Terminate[MBREAK]childs=-1[MBREAK][0x056A97B8][MBREAK]handle=$fileMenuItem[MBREAK]textmode=text[MBREAK]text=File[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=[MBREAK]childs=0x056A9698|0x056A9CC8[MBREAK][0x056A9CC8][MBREAK]handle=$fileMenuExit[MBREAK]textmode=text[MBREAK]text=Exit[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=Terminate[MBREAK]childs=-1[MBREAK][0x056A95C0][MBREAK]handle=$fileMenuItem[MBREAK]textmode=text[MBREAK]text=File[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=[MBREAK]childs=0x056A99F8|0x056A9CC8[MBREAK][0x056A99F8][MBREAK]handle=$MenuItemSettings[MBREAK]textmode=text[MBREAK]text=Settings[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=opensettings[MBREAK]childs=-1[MBREAK][0x056A9770][MBREAK]handle=$fileMenuItem[MBREAK]textmode=text[MBREAK]text=File[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=[MBREAK]childs=0x056A9410|0x056A99B0[MBREAK][0x056A9410][MBREAK]handle=$MenuItemSettings[MBREAK]textmode=text[MBREAK]text=Download To[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=opensettings[MBREAK]childs=-1[MBREAK][0x056A99B0][MBREAK]handle=$fileMenuExit[MBREAK]textmode=text[MBREAK]text=Exit[MBREAK]iconmode=0[MBREAK]iconpath=[MBREAK]iconvarible=[MBREAK]iconid=[MBREAK]radio=0[MBREAK]checked=0[MBREAK]func=Terminate[MBREAK]childs=-1
 state=
 style=
 exstyle=
