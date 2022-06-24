@@ -73,8 +73,6 @@ func loggen($text,  $guictrl = $globalLog)
 	$textLog = StringRegExpReplace(GUICtrlRead($guictrl), "(?m)(\r\n){2,}", @CRLF)
 	$textLog = StringStripWS($textLog, 3)
 	GUICtrlSetData($guictrl, $text & @CRLF & $textLog )
-
-	
 EndFunc
 
 Func startDL($link,  $params,  $log)	
@@ -82,9 +80,9 @@ Func startDL($link,  $params,  $log)
 	GUICtrlSetBkColor($globalLog,$DLINPROCESS)
 	$gesamtlog = ""
 	Local $line
-	loggen("yt-dlp.exe " &  $params& " -n16 " & $link & @crlf)
+	loggen("yt-dlp.exe --no-mtime" &  $params& " -n16 " & $link & @crlf)
 
-	$proc = Run ( "yt-dlp.exe " &  $params& "  " & $link , @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD )
+	$proc = Run ( "yt-dlp.exe --no-mtime" &  $params& "  " & $link , @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD )
 
 While 1
     $line  =StdoutRead($proc)
