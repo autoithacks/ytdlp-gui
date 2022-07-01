@@ -62,7 +62,7 @@ EndFunc
 func dlIn360p()
 	GUICtrlSetState($btnDl360p, $GUI_DISABLE)
 	$link = _GUICtrlRichEdit_GetText($input360p)
-	startDL($link, " -f 18 -P home:"&$dlpath & " ",  "")
+	startDL($link, "--force-overwrites   -f 18 -P home:"&$dlpath & " ",  "")
 	 _GUICtrlRichEdit_SetText($input360p, "")
 	 GUICtrlSetState($btnDl360p, $GUI_ENABLE)
 EndFunc
@@ -80,9 +80,9 @@ Func startDL($link,  $params,  $log)
 	GUICtrlSetBkColor($globalLog,$DLINPROCESS)
 	$gesamtlog = ""
 	Local $line
-	loggen("yt-dlp.exe --no-mtime" &  $params& " -n16 " & $link & @crlf)
+	loggen("yt-dlp.exe --no-mtime --no-part " &  $params& " -n16 " & $link & @crlf)
 
-	$proc = Run ( "yt-dlp.exe --no-mtime" &  $params& "  " & $link , @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD )
+	$proc = Run ( "yt-dlp.exe --no-mtime --no-part " &  $params& "  " & $link , @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD )
 
 While 1
     $line  =StdoutRead($proc)
@@ -95,31 +95,32 @@ Wend
 GUICtrlSetData($log, $line)
 
 if StringInStr($gesamtlog, "error")   then
-$aArray = _StringBetween($gesamtlog, "Destination: ", "].mp4")
+		#cs
+		$aArray = _StringBetween($gesamtlog, "Destination: ", "].mp4")
 		_GUICtrlRichEdit_SetText($input360p, $link)
 		GUICtrlSetBkColor($globalLog,$DLERROR)
-		MsgBox($MB_TOPMOST, "STDOUT read:", $gesamtlog)
         
 		if isarray($aArray) Then 
 			$tempfile = $aArray[0]
-			FileDelete($tempfile &  "].mp4.part")
-			
+			FileDelete($tempfile &  "].mp4.part")			
 		EndIf
+		#ce
 		
+		MsgBox($MB_TOPMOST, "STDOUT read:", $gesamtlog)
 	return
 EndIf
 
 
 if  StringInStr($gesamtlog, "already been")  then
-		MsgBox($MB_TOPMOST, "Already downloaded!", $gesamtlog)	
+;		MsgBox($MB_TOPMOST, "Already downloaded!", $gesamtlog)	
+	
+MsgBox(262192,"Already downloaded","File already exists!",0)
+
 	GUICtrlSetBkColor($globalLog,$DLSUCCESS)	
 	return
 EndIf
 	GUICtrlSetBkColor($globalLog,$DLSUCCESS)
 	loggen(@crlf& "Download complete")
-	
-
-
 EndFunc
 
 func opensettings()
