@@ -95,11 +95,11 @@ Wend
 GUICtrlSetData($log, $line)
 
 if StringInStr($gesamtlog, "error")   then
-		#cs
-		$aArray = _StringBetween($gesamtlog, "Destination: ", "].mp4")
 		_GUICtrlRichEdit_SetText($input360p, $link)
 		GUICtrlSetBkColor($globalLog,$DLERROR)
-        
+       #cs
+		$aArray = _StringBetween($gesamtlog, "Destination: ", "].mp4")
+		 
 		if isarray($aArray) Then 
 			$tempfile = $aArray[0]
 			FileDelete($tempfile &  "].mp4.part")			
