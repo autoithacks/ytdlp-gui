@@ -12,6 +12,9 @@ const $DLERROR = 0xFF0000
 const $DLINPROCESS = 0xFFFF00
 const $DLSUCCESS = 0x339966
 $dlpath=""
+$videotitle=""
+$gesamtlog = ""
+$link=""
 
 Opt("GUIOnEventMode", 1)
 
@@ -20,8 +23,9 @@ readsettings()
 GUISetOnEvent($GUI_EVENT_CLOSE, "Terminate")
 GUISetState(@SW_SHOW)
 Global $globallogstr
-	
+$dlbitrate=""	
 
+	GUICtrlSetState($input720p, $GUI_DISABLE)
 While 1
 	
 	
@@ -29,9 +33,11 @@ While 1
     select
    ; DETECT DRAG AND DROP EVENT HERE <-------------------
     Case _GUICtrlRichEdit_GetText($input720p) <> '' ;And Not GUICtrlRead($dircont)
+		 $dlbitrate="720p"
          dlIn720p()
     Case _GUICtrlRichEdit_GetText($input360p) <> '' ;And Not GUICtrlRead($dircont)
-         dlIn360p()
+         $dlbitrate="360p"
+		 dlIn360p()
     endselect
 	
 	
@@ -44,7 +50,8 @@ Func Terminate()
 EndFunc
 
 func dlIn720p()
-
+	$videotitle="";
+	GUICtrlSetData($globalLog, "")
 	$link = _GUICtrlRichEdit_GetText($input720p)
 	if(not StringInStr($link, 'watch') ) then 
 			 _GUICtrlRichEdit_SetText($input720p, "")
@@ -54,16 +61,22 @@ func dlIn720p()
 	EndIf 
 	
 	GUICtrlSetState($btnDl720p, $GUI_DISABLE)
+	GUICtrlSetState($input720p, $GUI_DISABLE)
 		startDL($link, " -22 -P home:"&$dlpath & " ",  "")
 	 _GUICtrlRichEdit_SetText($input720p, "")
+	GUICtrlSetState($input720p, $GUI_ENABLE)
 	 GUICtrlSetState($btnDl720p, $GUI_ENABLE)
 EndFunc
 
 func dlIn360p()
+	$videotitle="";
+	GUICtrlSetData($globalLog, "")
 	GUICtrlSetState($btnDl360p, $GUI_DISABLE)
+	GUICtrlSetState($input360p, $GUI_DISABLE)
 	$link = _GUICtrlRichEdit_GetText($input360p)
 	startDL($link, "--force-overwrites   -f 18 -P home:"&$dlpath & " ",  "")
 	 _GUICtrlRichEdit_SetText($input360p, "")
+	GUICtrlSetState($input360p, $GUI_ENABLE)
 	 GUICtrlSetState($btnDl360p, $GUI_ENABLE)
 EndFunc
 
@@ -72,6 +85,7 @@ func loggen($text,  $guictrl = $globalLog)
 	ConsoleWrite($text & @CRLF) 
 	$textLog = StringRegExpReplace(GUICtrlRead($guictrl), "(?m)(\r\n){2,}", @CRLF)
 	$textLog = StringStripWS($textLog, 3)
+	
 	GUICtrlSetData($guictrl, $text & @CRLF & $textLog )
 EndFunc
 
@@ -97,30 +111,17 @@ GUICtrlSetData($log, $line)
 if StringInStr($gesamtlog, "error")   then
 		_GUICtrlRichEdit_SetText($input360p, $link)
 		GUICtrlSetBkColor($globalLog,$DLERROR)
-       #cs
-		$aArray = _StringBetween($gesamtlog, "Destination: ", "].mp4")
-		 
-		if isarray($aArray) Then 
-			$tempfile = $aArray[0]
-			FileDelete($tempfile &  "].mp4.part")			
-		EndIf
-		#ce
-		
-		MsgBox($MB_TOPMOST, "STDOUT read:", $gesamtlog)
+	MsgBox($MB_TOPMOST, "Error "&$dlbitrate, $gesamtlog)
 	return
 EndIf
 
 
-if  StringInStr($gesamtlog, "already been")  then
-;		MsgBox($MB_TOPMOST, "Already downloaded!", $gesamtlog)	
-	
-MsgBox(262192,"Already downloaded","File already exists!",0)
-
-	GUICtrlSetBkColor($globalLog,$DLSUCCESS)	
-	return
-EndIf
+	if  StringInStr($gesamtlog, "already been")  then
+	MsgBox(262192,"Already downloaded","File already exists!",0)
+	EndIf
 	GUICtrlSetBkColor($globalLog,$DLSUCCESS)
-	loggen(@crlf& "Download complete")
+	loggen($link&@crlf&$videotitle &@crlf& "Download complete")
+
 EndFunc
 
 func opensettings()
@@ -132,6 +133,21 @@ func opensettings()
 	readsettings()
 	EndIf 
 EndFunc
+
+func getvideotitle()
+		if StringLen($videotitle) > 3 then
+			return $videotitle
+		EndIf
+
+		$aArray = _StringBetween($gesamtlog, "Destination: ", "].mp4")
+		 
+		if isarray($aArray) Then 
+			$tempfile = $aArray[0]
+			return $tempfile;
+		EndIf
+		 
+		
+endfunc
 
 func readsettings(	)
 $dlpath=  IniRead("settings.ini", "", "download_to", "c:\_downloads\") 
