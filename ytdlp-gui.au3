@@ -2,6 +2,7 @@
 ;ytdlp-gui.au3 by jichs
 ;Erstellt mit ISN AutoIt Studio v. 1.13
 ;*****************************************
+#pragma compile(AutoItExecuteAllowed, True)
 #include "windowMain.isf"
 #include <Array.au3>
 #include <String.au3>
@@ -118,7 +119,7 @@ Func startDL($link, $params, $log)
 	Wend
 	GUICtrlSetData($log, $line)
 
-	if StringInStr($gesamtlog, "error") then
+	if StringInStr($gesamtlog, " error") then
 		_GUICtrlRichEdit_SetText($input360p, $link)
 		GUICtrlSetBkColor($globalLog, $DLERROR)
 		if $dlbitrate = "360p" then
@@ -137,7 +138,6 @@ EndFunc   ;==>startDL
 
 func opensettings()
 	$dldir = FileSelectFolder("dialog text)", "c:\")
-
 	if(StringLen($dldir) > 2) Then
 		IniWrite("settings.ini", "", "download_to", $dldir)
 		loggen("DL dir set to=" & $dldir)
@@ -156,13 +156,19 @@ func getvideotitle()
 		$tempfile = $aArray[0]
 		return $tempfile ;
 	EndIf
-
-
 endfunc   ;==>getvideotitle
 
 func readsettings()
 	$dlpath = IniRead("settings.ini", "", "download_to", "c:\_downloads\")
 EndFunc   ;==>readsettings
+
+func newinstance()
+	_RunAU3("ytdlp-gui.au3")
+EndFunc   ;==>newinstance
+
+func funcCheckEXEUpdates()
+	ShellExecute("https://github.com/yt-dlp/yt-dlp")
+EndFunc
 
 func overwriteClicked()
 	$title = WinGetTitle($windowMain)
@@ -177,3 +183,8 @@ func overwriteClicked()
 	EndIf
 
 EndFunc   ;==>overwriteClicked
+
+Func _RunAU3($sFilePath, $sWorkingDir = @ScriptDir, $iShowFlag = @SW_SHOW, $iOptFlag = 0)
+	Run('"' & @AutoItExe & '" /AutoIt3ExecuteScript "' & $sFilePath & '"', $sWorkingDir, $iShowFlag, $iOptFlag)
+	;ShellExecuteWait(@ProgramFilesDir & '\AutoIt3\Aut2Exe\Aut2exe.exe', ' /in .au3')
+EndFunc   ;==>_RunAU3
