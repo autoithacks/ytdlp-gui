@@ -4,19 +4,22 @@
 ;*****************************************
 #pragma compile(AutoItExecuteAllowed, True)
 #include "windowMain.isf"
+#include "ytMetadata.au3"
 #include <Array.au3>
 #include <String.au3>
 #include <MsgBoxConstants.au3>
+#include <WinAPIGdi.au3>
+
 
 
 const $DLERROR = 0xFF0000
 const $DLINPROCESS = 0xFFFF00
 const $DLSUCCESS = 0x339966
-const $opt_params2='  --embed-subs --write-auto-sub  --no-mtime --no-part '
-const $opt_sdubtitles=' --write-subs --write-auto-subs --sub-langs "en, en-orig" --embed-subs  --convert-subs srt --compat-options no-keep-subs '&$opt_params2
+const $opt_params2='  --embed-subs --write-auto-sub  --no-mtime --no-part --retries infinite --continue '
+const $opt_sdubtitles=' --write-subs --write-auto-subs --sub-langs "de, de-orig, en, en-orig" --embed-subs  --convert-subs srt --compat-options no-keep-subs '&$opt_params2
 
 $defaultBirate="1080|720|highest" 
-$defaultBirateSelected="1080"
+$defaultBirateSelected="720"
 GUICtrlSetData($bitrateselect, "", "")
 GUICtrlSetData($bitrateselect, $defaultBirate, $defaultBirateSelected)
 
@@ -30,15 +33,15 @@ $dlbitrate = ""
 $downloading = false
 
 Opt("GUIOnEventMode", 1)
+$adlibpause=250
 
-AdlibRegister("getProgress", 250)
+AdlibRegister("getProgress", $adlibpause)
 readsettings()
 GUISetOnEvent($GUI_EVENT_CLOSE, "Terminate")
 GUISetState(@SW_SHOW)
 GUICtrlGetState($menuOverwrieHandler)
 
 
-;GUICtrlSetState($input720p, $GUI_DISABLE)
 
 
 
@@ -58,8 +61,30 @@ While 1
 	Sleep(50)
 WEnd
 
+func checkForCustomChannelBitrate ()
+
+	GUICtrlSetState($input720p, $GUI_DISABLE)
+	GUICtrlSetBkColor($globalLog, $DLINPROCESS)
+
+	$url = _GUICtrlRichEdit_GetText($input720p)
+	$channel=getChannelNameFromUrl($url)
+	return getDLfunction($channel)
+	
+endfunc
+
+func checkChannelName()
+	Run(@AutoItExe & ' "' & "getChannelName.au3" & '"')
+	Run("notepad.exe" & ' "' & "channelDLset.csv" & '"')
+	
+EndFunc
 
 func selectBitrate ()
+			
+			$customDLfunc=checkForCustomChannelBitrate() 
+			if $customDLfunc<>"" then
+			Call($customDLfunc, true)
+			return
+			endif
 	
 			If GUICtrlRead($bitrateSelect) = "1080"Then 
 			$dlbitrate = "1080p"
@@ -73,6 +98,10 @@ func selectBitrate ()
 			
 EndFunc
 	
+func updateRecentDL($text)
+	;_GUICtrlMenu_SetItemText($recentDownloadItem, 1,$text) 	
+	GUICtrlSetData($recentDownloadItem, $text, "")
+EndFunc
 	
 Func Terminate()
 	_GUICtrlRichEdit_Destroy($windowmain)
@@ -80,6 +109,7 @@ Func Terminate()
 EndFunc   ;==>Terminate
 
 Func correctURL($link)
+	updateRecentDL($link)
 	$link = StringReplace($link, 'https://www.youtube.com/shorts/', 'https://www.youtube.com/watch?v=')
 	$link = StringReplace($link, '&list=', '&-&')
 	
@@ -91,12 +121,12 @@ Func correctURL($link)
 EndFunc   ;==>Terminate
 
 
-func dlInHighest()
+func dlInHighest($customChannelBitrate=False)
 	$videotitle = "" ;
 	GUICtrlSetData($globalLog, "")
 	$link = correctURL(_GUICtrlRichEdit_GetText($input720p))
 	
-	if(not StringInStr($link, 'watch')) then
+	if(not StringInStr($link, 'watch') and $customChannelBitrate=False ) then
 		_GUICtrlRichEdit_SetText($input720p, "")
 		loggen("Dragging pictures not supported!")
 		GUICtrlSetBkColor($globalLog, $DLERROR)
@@ -115,14 +145,28 @@ func dlInHighest()
 	startDL($link, $params, "")
 	_GUICtrlRichEdit_SetText($input720p, "")
 	GUICtrlSetState($input720p, $GUI_ENABLE)
-EndFunc   ;==>dlIn720p
+EndFunc   
 
-func dlIn720p()
+func checkNotYTProvider($link)
+
+	if( StringInStr($link, 'odysee.com') or StringInStr($link, 'rutube.ru')  ) then
+	downloadOdysee($link,"")
+	return true
+	else
+	return false
+	endif
+EndFunc
+
+func dlIn720p($customChannelBitrate=False)
 	$videotitle = "" ;
 	GUICtrlSetData($globalLog, "")
 	$link = correctURL(_GUICtrlRichEdit_GetText($input720p))
 	
-	if(not StringInStr($link, 'watch')) then
+	if  ( checkNotYTProvider($link) ) then
+	return
+	endif
+	
+	if(not StringInStr($link, 'watch') and $customChannelBitrate=False) then
 		_GUICtrlRichEdit_SetText($input720p, "")
 		loggen("Dragging pictures not supported!")
 		GUICtrlSetBkColor($globalLog, $DLERROR)
@@ -133,7 +177,8 @@ func dlIn720p()
 	GUICtrlSetState($input720p, $GUI_DISABLE)
 	
 	
-	$params = " -f mp4 "& $opt_params2 & "  --sponsorblock-remove all -o  " &$dlpath&"\\%(title)s-%(id)s.%(ext)s" 	
+	;$params = " -f mp4 "& $opt_params2 & "  --sponsorblock-remove all -o  " &$dlpath&"\\%(title)s-%(id)s.%(ext)s" 	
+	$params = " -f bestvideo[height<=720]+bestaudio --merge-output-format mp4"& $opt_params2 & "  --sponsorblock-remove all -o  " &$dlpath&"\\%(title)s-%(id)s.%(ext)s" 	
 	If BitAnd(GUICtrlRead($menuOverwrieHandler), $GUI_CHECKED) = $GUI_CHECKED Then
 		$params &= " --force-overwrites "
 	EndIf
@@ -143,18 +188,22 @@ func dlIn720p()
 EndFunc   ;==>dlIn720p
 
 
-func dlIn1080p()	
+
+
+func dlIn1080p($customChannelBitrate=False)	
 	$videotitle = "" ;
 	GUICtrlSetData($globalLog, "")
 	$link = correctURL(_GUICtrlRichEdit_GetText($input720p))
+	; MsgBox(0, "Gefunden",  $customChannelBitrate)
+     			
 	
 	
-	if( StringInStr($link, 'odysee.com')) then
+	if( StringInStr($link, 'odysee.com') or StringInStr($link, 'rutube.ru')  ) then
 	downloadOdysee($link,"")
-	return
+	return true
 	endif
 
-	if(not StringInStr($link, 'watch')) then
+	if(not StringInStr($link, 'watch') and not $customChannelBitrate) then
 		_GUICtrlRichEdit_SetText($input720p, "")
 		loggen("Dragging pictures not supported!")
 		GUICtrlSetBkColor($globalLog, $DLERROR)	
@@ -162,7 +211,7 @@ func dlIn1080p()
 		return
 	EndIf
 
-	$params = $opt_sdubtitles&" -f bv*[height<=1080][ext=mp4]+ba --merge-output-format mp4 --sponsorblock-remove all -o  -f bv*[height<=1080][ext=mp4]+ba --merge-output-format mp4 --sponsorblock-remove all -o "&$dlpath&"\\%(title)s-%(id)s.%(ext)s" 	
+	$params = "  "&$opt_sdubtitles&" -f bv*[height<=1080][ext=mp4]+ba --merge-output-format mp4 --sponsorblock-remove all -o  -f bv*[height<=1080][ext=mp4]+ba --merge-output-format mp4 --sponsorblock-remove all -o "&$dlpath&"\\%(title)s-%(id)s.%(ext)s" 	
 loggen(":---------------------")	
 loggen(@crlf & $params &@crlf)
 loggen("+---------------------")	
@@ -177,7 +226,7 @@ EndFunc   ;==>dlIn1080p
 
 func dlIn360p()	
 
-	
+
 	$videotitle = "" ;
 	GUICtrlSetData($globalLog, "")
 	$link = _GUICtrlRichEdit_GetText($input360p)
@@ -188,8 +237,9 @@ func dlIn360p()
 		downloadOdysee($link," -f hls-655 ")
 	return
 	endif	
-
-	startDL($link, "  --force-overwrites  --no-mtime  --no-part   -f 18 -P home:" & $dlpath & " ", "")
+	;yt-dlp -f "best[height<=360]" 
+	;startDL($link, "  --force-overwrites  --no-mtime  --no-part   -f 18 -P home:" & $dlpath & " ", "")
+	startDL($link, "  --force-overwrites  --no-mtime  --no-part  -f best[height<=480] -P home:" & $dlpath & " ", "")
 	_GUICtrlRichEdit_SetText($input360p, "")
 
 EndFunc   ;==>dlIn360p
@@ -212,14 +262,23 @@ Func downloadOdysee($link,$quality)
 	;ShellExecute("cmd","/c move *.mp4 "& $dlpath,@scriptdir, '',@SW_HIDE )
 EndFunc   ;==>Terminate
 
+Func downloadRutube($link,$quality)
+	
+	startDL($link, $quality &' --no-mtime ', "")
+	ShellExecuteWait("cmd","/c ren *.webm *.mp4 ",@scriptdir,'',@SW_HIDE )
+	ShellExecuteWait("cmd","/c ren *.mkv *.mp4 ",@scriptdir,'',@SW_HIDE )
+	;ShellExecute("cmd","/c move *.mp4 "& $dlpath,@scriptdir, '',@SW_HIDE )
+EndFunc   ;==>Terminate
+
+
 func setReadOnly($state)
 	_GUICtrlRichEdit_SetReadOnly($input720p, $state)
 	_GUICtrlRichEdit_SetReadOnly($input360p, $state)
 	if($state = false)then
 	_GUICtrlRichEdit_SetText($input720p, "")
 	_GUICtrlRichEdit_SetText($input360p, "")
-	GUICtrlSetData($bitrateselect, "", "")
-	GUICtrlSetData($bitrateselect, $defaultBirate, $defaultBirateSelected)
+	;GUICtrlSetData($bitrateselect, "", "")
+	;GUICtrlSetData($bitrateselect, $defaultBirate, $defaultBirateSelected)
 	
 	EndIf 
 endfunc
@@ -229,7 +288,7 @@ func getProgress()
 	$procent = _StringBetween2($line, "[download]", "%", 20)	
 	ConsoleWrite(@SEC& " ->" & $procent& @crlf)
 	
-    if $procent <> "" then
+    if $procent <> "" or  GUICtrlGetBkColor($globalLog) =  $DLSUCCESS then
 		;loggen($procent& " " & @crlf)
 		GUICtrlSetData($progressBar, $procent)
 	EndIf 	
@@ -241,8 +300,9 @@ Func startDL($link, $params, $log)
 	$gesamtlog = ""
 	$downloading = true
 	;Local $line
-	loggen("yt-dlp.exe  " & $link & " " & $params & @crlf)
-
+	loggen("-------------------------")
+	loggen("Download Befehl: "&@crlf& " yt-dlp.exe  " & $link & " " & $params & @crlf)
+	loggen("-------------------------")
 	$proc = Run("yt-dlp.exe " & $params & "  " & $link, @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 	setReadOnly(true)
 	While 1
@@ -275,8 +335,9 @@ Func startDL($link, $params, $log)
 	EndIf
 	
 
-
+	sleep(1.5*$adlibpause)	
 	GUICtrlSetBkColor($globalLog, $DLSUCCESS)
+	GUICtrlSetData($progressBar, 0)
 	loggen($link & @crlf & $videotitle & @crlf & "Download process complete")
 	if StringInStr($gesamtlog, "already been") then
 		loggen($link & @crlf & $videotitle & @crlf & "File already exists")
@@ -332,18 +393,30 @@ func funcCheckEXEUpdates()
 EndFunc
 
 func overwriteClicked()
-	$title = WinGetTitle($windowMain)
-	$title = stringreplace($title, " [+R]", "")
-
 	If BitAnd(GUICtrlRead($menuOverwrieHandler), $GUI_CHECKED) = $GUI_CHECKED Then
 		GUICtrlSetState($menuOverwrieHandler, $GUI_UNCHECKED)
-		WinSetTitle($windowMain, "", $title & "")
+		;WinSetTitle($windowMain, "", $title & "")
+		removeFromWindowTitle(" [+R]")
+		
 	Else
 		GUICtrlSetState($menuOverwrieHandler, $GUI_CHECKED)
-		WinSetTitle($windowMain, "", $title & " [+R]")
+		;WinSetTitle($windowMain, "", $title & " [+R]")
+		addToWindowTitle(" [+R]")
 	EndIf
 
 EndFunc   ;==>overwriteClicked
+
+func addToWindowTitle($text)
+	$title = WinGetTitle($windowMain)
+	WinSetTitle($windowMain, "", $title &  " "&$text)
+endfunc
+
+func removeFromWindowTitle($text)
+	$title = WinGetTitle($windowMain)
+	$title = stringreplace($title, $text, "")
+	WinSetTitle($windowMain, "", $title )
+endfunc
+
 
 func playlistClicked()
 	$title = WinGetTitle($windowMain)
@@ -358,7 +431,7 @@ func playlistClicked()
 		WinSetTitle($windowMain, "", $title & " [pl]")
 	EndIf
 
-EndFunc   ;==>overwriteClicked
+EndFunc   ;==>playlistClicked
 
 Func _RunAU3($sFilePath, $sWorkingDir = @ScriptDir, $iShowFlag = @SW_SHOW, $iOptFlag = 0)
 	Run('"' & @AutoItExe & '" /AutoIt3ExecuteScript "' & $sFilePath & '"', $sWorkingDir, $iShowFlag, $iOptFlag)
@@ -381,3 +454,13 @@ Func saveText($filename = "", $text = "")
     FileWrite($file, $text & @CRLF)
     FileClose($file)
 EndFunc   ;==>speichereText
+
+Func GUICtrlGetBkColor($hWnd)
+    If Not IsHWnd($hWnd) Then
+        $hWnd = GUICtrlGetHandle($hWnd)
+    EndIf
+    Local $hDC = _WinAPI_GetDC($hWnd)
+    Local $iColor = _WinAPI_GetPixel($hDC, 0, 0)
+    _WinAPI_ReleaseDC($hWnd, $hDC)
+    Return $iColor
+EndFunc   ;==>GUICtrlGetBkColor
