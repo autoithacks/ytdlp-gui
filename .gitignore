@@ -5,4 +5,5 @@
 *.dll
 *.bin
 *.so
-*.a
+*.affmpeg.exe
+ffprobe.exe
