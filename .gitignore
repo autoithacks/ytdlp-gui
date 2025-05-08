@@ -1,0 +1,8 @@
+# Ignoriere alle .exe-Dateien
+*.exe
+
+# Optional: Ignoriere auch andere Binärdateien
+*.dll
+*.bin
+*.so
+*.a
